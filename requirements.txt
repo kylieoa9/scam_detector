@@ -1,10 +1,15 @@
-streamlit
-pandas
-numpy
+numpy==1.26.1
 scipy
+pandas
 scikit-learn
 spacy==3.6.1
+thinc==8.2.2
 pyspellchecker
 joblib
 openpyxl
+streamlit
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl
+rich==14.3.3
+markdown-it-py==2.2.0
+mdurl==0.1.2
+pygments==2.19.2
