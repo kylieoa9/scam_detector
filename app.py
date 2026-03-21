@@ -2,18 +2,13 @@ import sys
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix, hstack
-#import spacy
-import subprocess
 from spellchecker import SpellChecker
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix
 import joblib
 import streamlit as st
 
 # -----------------------------
-# Load NLP tools and data
+# Load NLP tools
 # -----------------------------
 import spacy
 from spacy.cli import download
@@ -27,8 +22,17 @@ except OSError:
 
 spell = SpellChecker()
 
-# Load your dataset (must be in your repo)
+# -----------------------------
+# Load pre-trained model + vectorizer
+# -----------------------------
+tfidf = joblib.load("tfidf.pkl")
+final_model = joblib.load("scam_detector_model.pkl")
+
+# -----------------------------
+# Load dataset (optional)
+# -----------------------------
 df = pd.read_excel("project_data.xlsx")
+
 # -----------------------------
 # Helper functions
 # -----------------------------
@@ -76,40 +80,6 @@ def rule_flags(email, email_address):
     ]
 
 # -----------------------------
-# Feature extraction
-# -----------------------------
-emails = df["email_text"].tolist()
-tfidf = TfidfVectorizer(ngram_range=(1,2), max_features=5000)
-tfidf_matrix = tfidf.fit_transform(emails)
-
-stats_features = np.array([text_stats(email) for email in emails])
-rule_features = np.array([rule_flags(row["email_text"], row["email_address"]) for _, row in df.iterrows()])
-
-numeric_features = np.hstack([stats_features, rule_features])
-numeric_features_sparse = csr_matrix(numeric_features)
-
-X = hstack([tfidf_matrix, numeric_features_sparse])
-y = df["label"].values
-
-# -----------------------------
-# Train/Test split & model training
-# -----------------------------
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-final_model = LogisticRegression(
-    solver="liblinear",
-    max_iter=1000,
-    class_weight="balanced",
-    random_state=42
-)
-final_model.fit(X_train, y_train)
-
-# -----------------------------
-# Save model
-# -----------------------------
-joblib.dump(final_model, "scam_detector_model.pkl")
-
-# -----------------------------
 # Prediction function
 # -----------------------------
 def predict_scam(email_address, email_text):
@@ -121,8 +91,9 @@ def predict_scam(email_address, email_text):
     prob = final_model.predict_proba(features)[0][1]
     return prob
 
-
+# -----------------------------
 # Streamlit UI
+# -----------------------------
 st.title("Scam Email Detector")
 st.write("""
 Enter the **email address** and **email content** below to see the likelihood
@@ -143,7 +114,7 @@ if st.button("Check Email"):
     else:
         st.error(f"High Scam Probability: {prob:.2f}")
 
-    st.progress(prob)  # shows progress bar
+    st.progress(prob)
 
 # -----------------------------
 # Sidebar Info
@@ -161,5 +132,4 @@ This is a **rule-based/ML hybrid detector**; results are indicative.
 **Note:** This is a predictive tool and may not be 100% accurate. Always exercise caution with suspicious emails.
 
 Created using Python (sklearn, pandas, spellchecker, numpy, Streamlit)
-"""
-)
+""")
