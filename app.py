@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix, hstack
 import spacy
+import subprocess
 from spellchecker import SpellChecker
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split, cross_val_score
