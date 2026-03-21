@@ -14,10 +14,16 @@ import streamlit as st
 # -----------------------------
 # Load NLP tools and data
 # -----------------------------
-nlp = spacy.load("en_core_web_sm")
-spell = SpellChecker()
-df = pd.read_excel("/Users/kyliealberts/Desktop/project_data.xlsx")  # update path
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
 
+spell = SpellChecker()
+
+# Load your dataset (must be in your repo)
+df = pd.read_excel("project_data.xlsx")
 # -----------------------------
 # Helper functions
 # -----------------------------
