@@ -1,4 +1,4 @@
-#!/Users/kyliealberts/scam_env/bin/python3.12
+#!/Users/kyliealberts/scam_detector_app/scam_env/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys
