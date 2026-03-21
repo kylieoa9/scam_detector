@@ -2,7 +2,7 @@ import sys
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix, hstack
-import spacy
+#import spacy
 import subprocess
 from spellchecker import SpellChecker
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -15,10 +15,14 @@ import streamlit as st
 # -----------------------------
 # Load NLP tools and data
 # -----------------------------
+import spacy
+from spacy.cli import download
+
+# Load spaCy model, install if missing
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
-    subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+    download("en_core_web_sm")
     nlp = spacy.load("en_core_web_sm")
 
 spell = SpellChecker()
